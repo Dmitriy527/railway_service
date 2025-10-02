@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models import UniqueConstraint
 from django.conf import settings
 
+from user.models import User
+
 
 class Station(models.Model):
     name = models.CharField(max_length=100)
@@ -52,6 +54,7 @@ class Train(models.Model):
 
 
 class Journey(models.Model):
+    users = models.ManyToManyField(User, related_name='journeies')
     route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name='journeies')
     train = models.ForeignKey(Train, on_delete=models.CASCADE, related_name='journeies')
     departure_time = models.DateTimeField()
