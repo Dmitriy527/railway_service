@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import UniqueConstraint
 from django.conf import settings
 
-from user.models import User
+from user.models import Crew
 
 
 class Station(models.Model):
@@ -54,7 +54,7 @@ class Train(models.Model):
 
 
 class Journey(models.Model):
-    users = models.ManyToManyField(User, related_name='journeies')
+    users = models.ManyToManyField(Crew, related_name='journeies')
     route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name='journeies')
     train = models.ForeignKey(Train, on_delete=models.CASCADE, related_name='journeies')
     departure_time = models.DateTimeField()
@@ -67,7 +67,7 @@ class Journey(models.Model):
         verbose_name_plural = 'Journeies'
 
     def __str__(self):
-        return f'{self.route} - {self.train}: {self.departure_time} - {self.arrival_time}'
+        return f'{self.users.get()} {self.route} - {self.train}: {self.departure_time} - {self.arrival_time}'
 
 
 class Order(models.Model):
@@ -98,7 +98,7 @@ class Ticket(models.Model):
         verbose_name_plural = 'Tickets'
 
     def __str__(self):
-        return f'{self.cargo} - {self.seat}: {self.journey}'
+        return f'{self.journey.users.get()} {self.cargo} - {self.seat}: {self.journey}'
 
     @staticmethod
     def validate_seat(cargo: int, seat: int, cargo_num: int, place_in_cargo: int, error_to_raise) -> None:
