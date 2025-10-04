@@ -67,7 +67,7 @@ class Journey(models.Model):
         verbose_name_plural = 'Journeies'
 
     def __str__(self):
-        return f'{self.users.get()} {self.route} - {self.train}: {self.departure_time} - {self.arrival_time}'
+        return f'{self.route} - {self.train}: {self.departure_time} - {self.arrival_time}'
 
 
 class Order(models.Model):
@@ -98,7 +98,7 @@ class Ticket(models.Model):
         verbose_name_plural = 'Tickets'
 
     def __str__(self):
-        return f'{self.journey.users.get()} {self.cargo} - {self.seat}: {self.journey}'
+        return f'{self.order.user} {self.cargo} - {self.seat}: {self.journey}'
 
     @staticmethod
     def validate_seat(cargo: int, seat: int, cargo_num: int, place_in_cargo: int, error_to_raise) -> None:
