@@ -102,10 +102,10 @@ class Ticket(models.Model):
 
     @staticmethod
     def validate_seat(cargo: int, seat: int, cargo_num: int, place_in_cargo: int, error_to_raise) -> None:
-        if cargo < 1 or cargo > place_in_cargo:
+        if cargo < 1 or cargo > cargo_num:
             raise error_to_raise(
                 {
-                    'cargo': f'cargo must be between 1 and {place_in_cargo}, not {cargo}',
+                    'cargo': f'cargo must be between 1 and {cargo_num}, not {cargo}',
                 }
             )
         if seat < 1 or seat > place_in_cargo:
