@@ -33,6 +33,9 @@ class TrainRetriveSerializer(TrainSerializer):
 
 
 class RouteSerializer(serializers.ModelSerializer):
+    source = serializers.StringRelatedField()
+    destination = serializers.StringRelatedField()
+
     class Meta:
         model = Route
         fields = "__all__"
