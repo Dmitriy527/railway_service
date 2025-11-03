@@ -1,6 +1,10 @@
+from dataclasses import fields
+
+from django.conf.global_settings import AUTH_USER_MODEL
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from railway.models import TrainType, Station, Train, Route, Journey
+from railway.models import TrainType, Station, Train, Route, Journey, Order
 from user.models import Crew
 from user.serializers import CrewSerializer
 
@@ -76,4 +80,14 @@ class JourneySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Journey
+        fields = "__all__"
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field="username",
+    )
+    class Meta:
+        model = Order
         fields = "__all__"
