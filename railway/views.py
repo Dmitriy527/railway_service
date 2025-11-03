@@ -38,6 +38,8 @@ class RouteViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class
         elif self.action == "create":
             serializer = RouteSerializer
+        elif self.action == "update":
+            serializer = RouteSerializer
         return serializer
 
 
