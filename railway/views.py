@@ -1,9 +1,9 @@
 from rest_framework import viewsets
 
-from railway.models import TrainType, Station, Train, Route, Journey, Order
+from railway.models import TrainType, Station, Train, Route, Journey, Order, Ticket
 from railway.serializers import TrainTypeSerializer, StationSerializer, TrainSerializer, TrainListSerializer, \
     TrainRetriveSerializer, RouteStringSerializer, JourneySerializer, JourneyListSerializer, RouteSerializer, \
-    OrderSerializer
+    OrderSerializer, TicketSerializer
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
@@ -66,4 +66,9 @@ class JourneyViewSet(viewsets.ModelViewSet):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().select_related("user")
     serializer_class = OrderSerializer
+
+
+class TicketViewSet(viewsets.ModelViewSet):
+    queryset = Ticket.objects.all().select_related("journey", "order")
+    serializer_class = TicketSerializer
 

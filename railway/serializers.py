@@ -4,7 +4,7 @@ from django.conf.global_settings import AUTH_USER_MODEL
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from railway.models import TrainType, Station, Train, Route, Journey, Order
+from railway.models import TrainType, Station, Train, Route, Journey, Order, Ticket
 from user.models import Crew
 from user.serializers import CrewSerializer
 
@@ -90,4 +90,13 @@ class OrderSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Order
+        fields = "__all__"
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    journey = Journey.objects.all()
+    order = Order.objects.all()
+
+    class Meta:
+        model = Ticket
         fields = "__all__"
