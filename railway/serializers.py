@@ -92,11 +92,6 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = "__all__"
 
-    def create(self, validated_data):
-        # Автоматично призначаємо поточного користувача
-        validated_data['user'] = self.context['request'].user
-        return super().create(validated_data)
-
 
 class OrderCreateSerializer(serializers.ModelSerializer):
     user = User.objects.all()
@@ -109,6 +104,14 @@ class TicketSerializer(serializers.ModelSerializer):
     journey = JourneyListSerializer()
     order = OrderCreateSerializer()
 
+    class Meta:
+        model = Ticket
+        fields = "__all__"
+
+
+class TicketCreateSerializer(serializers.ModelSerializer):
+    journey = Journey.objects.all()
+    order = Journey.objects.all()
     class Meta:
         model = Ticket
         fields = "__all__"
