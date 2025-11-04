@@ -97,9 +97,17 @@ class OrderSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
+
+class OrderCreateSerializer(serializers.ModelSerializer):
+    user = User.objects.all()
+    class Meta:
+        model = Order
+        fields = "__all__"
+
+
 class TicketSerializer(serializers.ModelSerializer):
-    journey = Journey.objects.all()
-    order = Order.objects.all()
+    journey = JourneyListSerializer()
+    order = OrderCreateSerializer()
 
     class Meta:
         model = Ticket
