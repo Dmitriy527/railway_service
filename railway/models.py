@@ -26,7 +26,7 @@ class Route(models.Model):
         verbose_name_plural = 'Routes'
 
     def __str__(self):
-        return f'{self.distance}km.'
+        return f'{self.source.name} - {self.destination.name}: {self.distance}km.'
 
 
 
