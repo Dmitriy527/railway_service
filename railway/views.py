@@ -52,6 +52,8 @@ class JourneyViewSet(viewsets.ModelViewSet):
             return JourneyListSerializer
         if self.action == "create":
             return JourneySerializer
+        if self.action == "retrieve":
+            return JourneyListSerializer
         return JourneySerializer
 
     def get_queryset(self):
