@@ -83,7 +83,7 @@ class JourneySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderListSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         read_only=True,
         slug_field="username",
@@ -94,15 +94,18 @@ class OrderSerializer(serializers.ModelSerializer):
 
 
 class OrderCreateSerializer(serializers.ModelSerializer):
-    user = User.objects.all()
+    user = serializers.SlugRelatedField(
+        slug_field='username',
+        queryset=User.objects.all()
+    )
     class Meta:
         model = Order
         fields = "__all__"
 
 
-class TicketSerializer(serializers.ModelSerializer):
+class TicketListSerializer(serializers.ModelSerializer):
     journey = JourneyListSerializer()
-    order = OrderCreateSerializer()
+    order = OrderListSerializer()
 
     class Meta:
         model = Ticket
@@ -110,8 +113,8 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketCreateSerializer(serializers.ModelSerializer):
-    journey = Journey.objects.all()
-    order = Journey.objects.all()
+    journey = JourneySerializer
+    order = Order.objects.all()
     class Meta:
         model = Ticket
         fields = "__all__"
