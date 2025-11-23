@@ -76,7 +76,16 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all().select_related("journey", "order")
+    # queryset = Ticket.objects.all().select_related("journey", "order")
+    queryset = Ticket.objects.select_related(
+        "journey__route__source",
+        "journey__route__destination",
+        "journey__train__train_type",
+        "journey__train",
+        "journey",
+        "order"
+    ).prefetch_related(
+        "journey__users")
     serializer_class = TicketCreateSerializer
 
     def get_serializer_class(self):
