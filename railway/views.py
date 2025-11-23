@@ -83,7 +83,7 @@ class TicketViewSet(viewsets.ModelViewSet):
         "journey__train__train_type",
         "journey__train",
         "journey",
-        "order"
+        "order__user"
     ).prefetch_related(
         "journey__users")
     serializer_class = TicketCreateSerializer
