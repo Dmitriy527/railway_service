@@ -29,8 +29,15 @@ class TrainSerializer(serializers.ModelSerializer):
 
 class TrainListSerializer(TrainSerializer):
     train_type = serializers.SlugRelatedField(
+        slug_field="name",
+        read_only=True,
+    )
+
+
+class TrainUpdateCreateSerializer(TrainSerializer):
+    train_type = serializers.SlugRelatedField(
         queryset=TrainType.objects.all(),
-        slug_field="name"
+        slug_field="name",
     )
 
 
