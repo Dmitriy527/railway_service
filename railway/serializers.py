@@ -34,7 +34,7 @@ class TrainListSerializer(TrainSerializer):
     )
 
 
-class TrainRetriveSerializer(TrainSerializer):
+class TrainRetrieveSerializer(TrainSerializer):
     train_type = TrainTypeSerializer()
 
 
