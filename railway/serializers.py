@@ -46,9 +46,15 @@ class TrainRetrieveSerializer(TrainSerializer):
 
 
 
-class RouteSerializer(serializers.ModelSerializer):
-    source = Station.objects.all()
-    destination = Station.objects.all()
+class RouteUpdateCreateSerializer(serializers.ModelSerializer):
+    source = serializers.SlugRelatedField(
+        queryset=Station.objects.all(),
+        slug_field="name",
+    )
+    destination = serializers.SlugRelatedField(
+        queryset=Station.objects.all(),
+        slug_field="name",
+    )
     class Meta:
         model = Route
         fields = "__all__"
