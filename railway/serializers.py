@@ -2,6 +2,7 @@ from dataclasses import fields
 
 from django.conf.global_settings import AUTH_USER_MODEL
 from django.contrib.auth.models import User
+from django.db import transaction
 from rest_framework import serializers
 
 from railway.models import TrainType, Station, Train, Route, Journey, Order, Ticket
@@ -131,3 +132,24 @@ class TicketCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = "__all__"
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ["id", "cargo", "seat", "journey"]
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    tickets = TicketSerializer(many=True, read_only=True, allow_empty=False)
+    class Meta:
+        model = Order
+        fields = ["id", "created_at", "tickets"]
+
+    def create(self, validated_data):
+        with transaction.atomic():
+            tickets_data = validated_data.pop('tickets')
+            order = Order.objects.create(**validated_data)
+            for ticket_data in tickets_data:
+                Ticket.objects.create(order=order, **ticket_data)
+            return order
