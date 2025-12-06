@@ -80,6 +80,18 @@ class JourneyListSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class JourneyRetrieveSerializer(JourneyListSerializer):
+    sold_tickets = serializers.StringRelatedField(
+        many=True,
+        read_only=True,
+        source="tickets"
+    )
+
+    class Meta:
+        model = Journey
+        fields = ("users", "route", "train", "departure_time", "arrival_time","sold_tickets")
+
+
 class JourneySerializer(serializers.ModelSerializer):
     users = serializers.PrimaryKeyRelatedField(
         many=True,

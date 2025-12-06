@@ -5,7 +5,7 @@ from railway.serializers import TrainTypeSerializer, StationSerializer, TrainSer
     TrainRetrieveSerializer, RouteStringSerializer, JourneySerializer, JourneyListSerializer, \
     RouteUpdateCreateSerializer, \
     OrderListSerializer, TicketListSerializer, OrderCreateSerializer, TicketCreateSerializer, \
-    TrainUpdateCreateSerializer, OrderSerializer
+    TrainUpdateCreateSerializer, OrderSerializer, JourneyRetrieveSerializer
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
@@ -69,7 +69,7 @@ class JourneyViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             return JourneySerializer
         if self.action == "retrieve":
-            return JourneyListSerializer
+            return JourneyRetrieveSerializer
         return JourneySerializer
 
     def get_queryset(self):
