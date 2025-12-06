@@ -31,7 +31,7 @@ class Route(models.Model):
 
 
 class TrainType(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     class Meta:
         verbose_name_plural = 'Train Types'

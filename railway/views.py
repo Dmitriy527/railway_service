@@ -22,6 +22,10 @@ class TrainViewSet(viewsets.ModelViewSet):
     queryset = Train.objects.all().select_related("train_type")
     serializer_class = TrainSerializer
 
+    @staticmethod
+    def _params_to_ints(query_string):
+        return [int(str_id) for str_id in query_string.split(",")]
+
     def get_serializer_class(self) -> object:
         if self.action == "list":
             return TrainListSerializer
@@ -31,6 +35,16 @@ class TrainViewSet(viewsets.ModelViewSet):
             return TrainUpdateCreateSerializer
         else:
             return self.serializer_class
+
+    def get_queryset(self):
+        queryset = self.queryset
+        train_types = self.request.query_params.get("train_types")
+
+        if train_types:
+            train_types = self._params_to_ints(train_types)
+            queryset = queryset.filter(train_type__in=train_types)
+
+        return queryset.distinct()
 
 
 class RouteViewSet(viewsets.ModelViewSet):
