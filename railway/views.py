@@ -83,7 +83,7 @@ class JourneyViewSet(viewsets.ModelViewSet):
             ).prefetch_related("users")
                         .annotate(
                 tickets_available=F("train__cargo_num") * F("train__place_in_cargo")
-                                  + Count("tickets")))
+                                  - Count("tickets")))
         if self.action in "retrieve":
             queryset = self.queryset.select_related(
                 "route__source",
