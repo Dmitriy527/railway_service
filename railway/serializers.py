@@ -74,6 +74,7 @@ class JourneyListSerializer(serializers.ModelSerializer):
     users = serializers.StringRelatedField(many=True)
     route = serializers.StringRelatedField()
     train = serializers.StringRelatedField()
+    tickets_available = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Journey

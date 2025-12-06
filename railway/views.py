@@ -1,3 +1,4 @@
+from django.db.models import Count, F
 from rest_framework import viewsets
 
 from railway.models import TrainType, Station, Train, Route, Journey, Order, Ticket
@@ -73,11 +74,23 @@ class JourneyViewSet(viewsets.ModelViewSet):
         return JourneySerializer
 
     def get_queryset(self):
-        queryset = self.queryset.select_related(
-            "route__source",
-            "route__destination",
-            "train__train_type"
-        ).prefetch_related("users")
+        queryset = self.queryset
+        if self.action in "list":
+            queryset = (self.queryset.select_related(
+                "route__source",
+                "route__destination",
+                "train__train_type"
+            ).prefetch_related("users")
+                        .annotate(
+                tickets_available=F("train__cargo_num") * F("train__place_in_cargo")
+                                  + Count("tickets")))
+        if self.action in "retrieve":
+            queryset = self.queryset.select_related(
+                "route__source",
+                "route__destination",
+                "train__train_type"
+            ).prefetch_related("users")
+
         return queryset
 
 
