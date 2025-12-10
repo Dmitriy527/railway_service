@@ -1,7 +1,9 @@
 from django.db.models import Count, F
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
 
 from railway.models import TrainType, Station, Train, Route, Journey, Order, Ticket
+from railway.permissions import IsAdminOrIsAuthenticatedReadOnly
 from railway.serializers import (TrainTypeSerializer, StationSerializer, TrainSerializer, TrainListSerializer, \
                                  TrainRetrieveSerializer, RouteStringSerializer, JourneySerializer,
                                  JourneyListSerializer, \
@@ -15,6 +17,8 @@ from railway.serializers import (TrainTypeSerializer, StationSerializer, TrainSe
 class TrainTypeViewSet(viewsets.ModelViewSet):
     queryset = TrainType.objects.all()
     serializer_class = TrainTypeSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
 
 class StationViewSet(viewsets.ModelViewSet):
