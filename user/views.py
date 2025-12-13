@@ -1,14 +1,23 @@
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.settings import api_settings
 
-from user.serializers import UserSerializer
+from railway.permissions import IsAdminOrIsAuthenticatedReadOnly
+from user.models import Crew
+from user.serializers import UserSerializer, CrewSerializer
+
+
+class CrewViewSet(viewsets.ModelViewSet):
+    queryset = Crew.objects.all()
+    serializer_class = CrewSerializer
+    permission_classes = (IsAdminOrIsAuthenticatedReadOnly,)
 
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
+    permission_classes = (AllowAny,)
 
 
 class LoginUserView(ObtainAuthToken):
