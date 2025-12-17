@@ -47,7 +47,7 @@ class TrainViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         train_types = self.request.query_params.get("train_types")
-
+        
         if train_types:
             train_types = self._params_to_ints(train_types)
             queryset = queryset.filter(train_type__in=train_types)
