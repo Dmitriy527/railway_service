@@ -4,14 +4,23 @@ from rest_framework.authentication import TokenAuthentication
 
 from railway.models import TrainType, Station, Train, Route, Journey, Order, Ticket
 from railway.permissions import IsAdminOrIsAuthenticatedReadOnly
-from railway.serializers import (TrainTypeSerializer, StationSerializer, TrainSerializer, TrainListSerializer, \
-                                 TrainRetrieveSerializer, RouteStringSerializer, JourneySerializer,
-                                 JourneyListSerializer, \
-                                 RouteUpdateCreateSerializer, \
-                                 OrderListSerializer, TicketListSerializer, TicketCreateSerializer, \
-                                 TrainUpdateCreateSerializer, OrderSerializer, JourneyRetrieveSerializer,
-                                 TicketSerializer, )
-                                 # OrderCreateSerializer)
+from railway.serializers import (
+    TrainTypeSerializer,
+    StationSerializer,
+    TrainSerializer,
+    TrainListSerializer,
+    TrainRetrieveSerializer,
+    RouteStringSerializer,
+    JourneySerializer,
+    JourneyListSerializer,
+    RouteUpdateCreateSerializer,
+    OrderListSerializer,
+    TicketListSerializer,
+    TicketCreateSerializer,
+    TrainUpdateCreateSerializer,
+    OrderSerializer,
+    JourneyRetrieveSerializer,
+)
 
 
 class TrainTypeViewSet(viewsets.ModelViewSet):
@@ -47,7 +56,7 @@ class TrainViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         train_types = self.request.query_params.get("train_types")
-        
+
         if train_types:
             train_types = self._params_to_ints(train_types)
             queryset = queryset.filter(train_type__in=train_types)
@@ -83,19 +92,19 @@ class JourneyViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset
         if self.action in "list":
-            queryset = (self.queryset.select_related(
-                "route__source",
-                "route__destination",
-                "train__train_type"
-            ).prefetch_related("users")
-                        .annotate(
-                tickets_available=F("train__cargo_num") * F("train__place_in_cargo")
-                                  - Count("tickets")))
+            queryset = (
+                self.queryset.select_related(
+                    "route__source", "route__destination", "train__train_type"
+                )
+                .prefetch_related("users")
+                .annotate(
+                    tickets_available=F("train__cargo_num") * F("train__place_in_cargo")
+                    - Count("tickets")
+                )
+            )
         if self.action in "retrieve":
             queryset = self.queryset.select_related(
-                "route__source",
-                "route__destination",
-                "train__train_type"
+                "route__source", "route__destination", "train__train_type"
             ).prefetch_related("users")
 
         return queryset
@@ -104,16 +113,20 @@ class JourneyViewSet(viewsets.ModelViewSet):
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all().select_related("journey", "order")
     serializer_class = TicketCreateSerializer
+
     def get_queryset(self):
-        queryset = self.queryset.select_related(
-        "journey__route__source",
-        "journey__route__destination",
-        "journey__train__train_type",
-        "journey__train",
-        "journey",
-        "order__user"
-    ).prefetch_related(
-        "journey__users").filter(order__user=self.request.user)
+        queryset = (
+            self.queryset.select_related(
+                "journey__route__source",
+                "journey__route__destination",
+                "journey__train__train_type",
+                "journey__train",
+                "journey",
+                "order__user",
+            )
+            .prefetch_related("journey__users")
+            .filter(order__user=self.request.user)
+        )
         return queryset
 
     def get_serializer_class(self):
@@ -131,14 +144,17 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = self.queryset.filter(user=self.request.user)
         if self.action == "list":
-            queryset = queryset.select_related("user").prefetch_related(
-                "tickets__journey__route__source",
-                "tickets__journey__route__destination",
-                "tickets__journey__train__train_type",
-                "tickets__journey__train",
-                "tickets__journey",
-            ).prefetch_related(
-                "tickets__journey__users")
+            queryset = (
+                queryset.select_related("user")
+                .prefetch_related(
+                    "tickets__journey__route__source",
+                    "tickets__journey__route__destination",
+                    "tickets__journey__train__train_type",
+                    "tickets__journey__train",
+                    "tickets__journey",
+                )
+                .prefetch_related("tickets__journey__users")
+            )
         return queryset
 
     def perform_create(self, serializer):

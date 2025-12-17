@@ -15,26 +15,29 @@ class Station(models.Model):
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='source_routes')
-    destination = models.ForeignKey(Station, on_delete=models.CASCADE, related_name='destination_routes')
+    source = models.ForeignKey(
+        Station, on_delete=models.CASCADE, related_name="source_routes"
+    )
+    destination = models.ForeignKey(
+        Station, on_delete=models.CASCADE, related_name="destination_routes"
+    )
     distance = models.IntegerField()
 
     class Meta:
         indexes = [
-            models.Index(fields=['source', 'destination']),
+            models.Index(fields=["source", "destination"]),
         ]
-        verbose_name_plural = 'Routes'
+        verbose_name_plural = "Routes"
 
     def __str__(self):
-        return f'{self.source.name} - {self.destination.name}: {self.distance}km.'
-
+        return f"{self.source.name} - {self.destination.name}: {self.distance}km."
 
 
 class TrainType(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     class Meta:
-        verbose_name_plural = 'Train Types'
+        verbose_name_plural = "Train Types"
 
     def __str__(self):
         return self.name
@@ -44,30 +47,32 @@ class Train(models.Model):
     name = models.CharField(max_length=100)
     cargo_num = models.IntegerField()
     place_in_cargo = models.IntegerField()
-    train_type = models.ForeignKey(TrainType, on_delete=models.CASCADE, related_name='trains')
+    train_type = models.ForeignKey(
+        TrainType, on_delete=models.CASCADE, related_name="trains"
+    )
 
     class Meta:
-        verbose_name_plural = 'Trains'
+        verbose_name_plural = "Trains"
 
     def __str__(self):
-        return f'{self.name}: cargo: {self.cargo_num}, place: {self.place_in_cargo}'
+        return f"{self.name}: cargo: {self.cargo_num}, place: {self.place_in_cargo}"
 
 
 class Journey(models.Model):
-    users = models.ManyToManyField(Crew, related_name='journeies')
-    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name='journeies')
-    train = models.ForeignKey(Train, on_delete=models.CASCADE, related_name='journeies')
+    users = models.ManyToManyField(Crew, related_name="journeies")
+    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="journeies")
+    train = models.ForeignKey(Train, on_delete=models.CASCADE, related_name="journeies")
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
 
     class Meta:
         indexes = [
-            models.Index(fields=['departure_time', 'arrival_time']),
+            models.Index(fields=["departure_time", "arrival_time"]),
         ]
-        verbose_name_plural = 'Journeies'
+        verbose_name_plural = "Journeies"
 
     def __str__(self):
-        return f'{self.departure_time} - {self.arrival_time}'
+        return f"{self.departure_time} - {self.arrival_time}"
 
 
 class Order(models.Model):
@@ -75,46 +80,53 @@ class Order(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='orders',
+        related_name="orders",
     )
 
     def __str__(self):
-        return f'{self.created_at}'
+        return f"{self.created_at}"
 
 
 class Ticket(models.Model):
     cargo = models.IntegerField()
     seat = models.IntegerField()
-    journey = models.ForeignKey(Journey, on_delete=models.CASCADE, related_name='tickets')
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='tickets')
+    journey = models.ForeignKey(
+        Journey, on_delete=models.CASCADE, related_name="tickets"
+    )
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")
 
     class Meta:
         constraints = [
             UniqueConstraint(
-                fields=['cargo', 'seat', 'journey'],
-                name='unique_ticket_cargo_seat_journey'),
+                fields=["cargo", "seat", "journey"],
+                name="unique_ticket_cargo_seat_journey",
+            ),
         ]
-        ordering = ['cargo', 'seat']
-        verbose_name_plural = 'Tickets'
+        ordering = ["cargo", "seat"]
+        verbose_name_plural = "Tickets"
 
     def __str__(self):
-        return f'{self.cargo} - {self.seat}'
+        return f"{self.cargo} - {self.seat}"
 
     @staticmethod
-    def validate_seat(cargo: int, seat: int, cargo_num: int, place_in_cargo: int, error_to_raise) -> None:
+    def validate_seat(
+        cargo: int, seat: int, cargo_num: int, place_in_cargo: int, error_to_raise
+    ) -> None:
         if cargo < 1 or cargo > cargo_num:
             raise error_to_raise(
                 {
-                    'cargo': f'cargo must be between 1 and {cargo_num}, not {cargo}',
+                    "cargo": f"cargo must be between 1 and {cargo_num}, not {cargo}",
                 }
             )
         if seat < 1 or seat > place_in_cargo:
             raise error_to_raise(
                 {
-                    'seat': f'seat must be between 1 and {place_in_cargo}, not {seat}',
+                    "seat": f"seat must be between 1 and {place_in_cargo}, not {seat}",
                 }
             )
 
     def clean(self) -> None:
         train = self.journey.train
-        Ticket.validate_seat(self.cargo, self.seat, train.cargo_num, train.place_in_cargo, ValueError)
+        Ticket.validate_seat(
+            self.cargo, self.seat, train.cargo_num, train.place_in_cargo, ValueError
+        )

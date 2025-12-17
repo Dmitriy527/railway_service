@@ -1,13 +1,8 @@
-from dataclasses import fields
-
-from django.conf.global_settings import AUTH_USER_MODEL
-from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import serializers
 
 from railway.models import TrainType, Station, Train, Route, Journey, Order, Ticket
 from user.models import Crew
-from user.serializers import CrewSerializer
 
 
 class TrainTypeSerializer(serializers.ModelSerializer):
@@ -46,7 +41,6 @@ class TrainRetrieveSerializer(TrainSerializer):
     train_type = TrainTypeSerializer()
 
 
-
 class RouteUpdateCreateSerializer(serializers.ModelSerializer):
     source = serializers.SlugRelatedField(
         queryset=Station.objects.all(),
@@ -56,6 +50,7 @@ class RouteUpdateCreateSerializer(serializers.ModelSerializer):
         queryset=Station.objects.all(),
         slug_field="name",
     )
+
     class Meta:
         model = Route
         fields = "__all__"
@@ -83,14 +78,19 @@ class JourneyListSerializer(serializers.ModelSerializer):
 
 class JourneyRetrieveSerializer(JourneyListSerializer):
     sold_tickets = serializers.StringRelatedField(
-        many=True,
-        read_only=True,
-        source="tickets"
+        many=True, read_only=True, source="tickets"
     )
 
     class Meta:
         model = Journey
-        fields = ("users", "route", "train", "departure_time", "arrival_time","sold_tickets")
+        fields = (
+            "users",
+            "route",
+            "train",
+            "departure_time",
+            "arrival_time",
+            "sold_tickets",
+        )
 
 
 class JourneySerializer(serializers.ModelSerializer):
@@ -110,7 +110,6 @@ class JourneySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
@@ -128,6 +127,7 @@ class TicketListSerializer(serializers.ModelSerializer):
 class TicketCreateSerializer(serializers.ModelSerializer):
     journey = JourneySerializer
     order = Order.objects.all()
+
     class Meta:
         model = Ticket
         fields = "__all__"
@@ -135,13 +135,14 @@ class TicketCreateSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     tickets = TicketSerializer(many=True, allow_empty=False)
+
     class Meta:
         model = Order
         fields = ["id", "created_at", "tickets"]
 
     def create(self, validated_data):
         with transaction.atomic():
-            tickets_data = validated_data.pop('tickets')
+            tickets_data = validated_data.pop("tickets")
             order = Order.objects.create(**validated_data)
             for ticket_data in tickets_data:
                 Ticket.objects.create(order=order, **ticket_data)
@@ -150,4 +151,3 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(OrderSerializer):
     tickets = TicketListSerializer(read_only=True, many=True)
-
