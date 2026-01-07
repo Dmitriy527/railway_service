@@ -27,11 +27,11 @@ User = get_user_model()
 
 class TrainTypeSerializerTest(TestCase):
     def setUp(self):
-        # Створюємо тестовий тип потяга для використання в тестах
+        # Create a test train type for use in tests
         self.train_type = TrainType.objects.create(name="Express")
 
     def test_train_type_serializer_fields(self):
-        """Тест перевіряє, що серіалізатор повертає правильні поля для типу потяга"""
+        """Test verifies that the serializer returns the correct fields for the train type"""
         serializer = TrainTypeSerializer(instance=self.train_type)
         data = serializer.data
 
@@ -39,7 +39,7 @@ class TrainTypeSerializerTest(TestCase):
         self.assertEqual(data["name"], "Express")
 
     def test_train_type_serializer_create(self):
-        """Тест перевіряє створення нового типу потяга через серіалізатор"""
+        """Test verifies the creation of a new train type through the serializer"""
         data = {"name": "Regional"}
         serializer = TrainTypeSerializer(data=data)
 
@@ -50,15 +50,13 @@ class TrainTypeSerializerTest(TestCase):
 
 class StationSerializerTest(TestCase):
     def setUp(self):
-        # Створюємо тестову станцію з координатами
+        # Create a test station with coordinates
         self.station = Station.objects.create(
-            name="Kyiv Central",
-            latitude=50.4501,
-            longitude=30.5234
+            name="Kyiv Central", latitude=50.4501, longitude=30.5234
         )
 
     def test_station_serializer_fields(self):
-        """Тест перевіряє правильність полів та їх значень у серіалізаторі станції"""
+        """Test verifies the correctness of fields and their values in the station serializer"""
         serializer = StationSerializer(instance=self.station)
         data = serializer.data
 
@@ -68,12 +66,8 @@ class StationSerializerTest(TestCase):
         self.assertEqual(float(data["longitude"]), 30.5234)
 
     def test_station_serializer_create(self):
-        """Тест перевіряє створення нової станції через серіалізатор"""
-        data = {
-            "name": "Lviv",
-            "latitude": 49.8397,
-            "longitude": 24.0297
-        }
+        """Test verifies the creation of a new station through the serializer"""
+        data = {"name": "Lviv", "latitude": 49.8397, "longitude": 24.0297}
         serializer = StationSerializer(data=data)
 
         self.assertTrue(serializer.is_valid())
@@ -83,17 +77,17 @@ class StationSerializerTest(TestCase):
 
 class TrainSerializerTest(TestCase):
     def setUp(self):
-        # Створюємо тестовий тип потяга та сам потяг
+        # Create a test train type and the train itself
         self.train_type = TrainType.objects.create(name="Express")
         self.train = Train.objects.create(
             name="Train 001",
             cargo_num=10,
             place_in_cargo=50,
-            train_type=self.train_type
+            train_type=self.train_type,
         )
 
     def test_train_serializer_fields(self):
-        """Тест перевіряє наявність основних полів у базовому серіалізаторі потяга"""
+        """Test verifies the presence of basic fields in the base train serializer"""
         serializer = TrainSerializer(instance=self.train)
         data = serializer.data
 
@@ -103,61 +97,61 @@ class TrainSerializerTest(TestCase):
         self.assertIn("place_in_cargo", data)
 
     def test_train_list_serializer(self):
-        """Тест перевіряє серіалізатор для списку потягів зі SlugRelatedField для типу"""
+        """Test verifies the serializer for train list with SlugRelatedField for type"""
         serializer = TrainListSerializer(instance=self.train)
         data = serializer.data
 
-        self.assertEqual(data["train_type"], "Express")  # Перевіряємо, що тип виводиться як строка
+        self.assertEqual(
+            data["train_type"], "Express"
+        )  # Verify that type is output as string
 
     def test_train_update_create_serializer(self):
-        """Тест перевіряє серіалізатор для оновлення та створення потяга"""
+        """Test verifies the serializer for updating and creating a train"""
         data = {
             "name": "Train 002",
             "cargo_num": 12,
             "place_in_cargo": 60,
-            "train_type": "Express"  # Використовуємо назву типу замість ID
+            "train_type": "Express",  # Use type name instead of ID
         }
         serializer = TrainUpdateCreateSerializer(data=data)
 
         self.assertTrue(serializer.is_valid())
         train = serializer.save()
         self.assertEqual(train.name, "Train 002")
-        self.assertEqual(train.train_type, self.train_type)  # Перевіряємо, що тип правильно зв'язаний
+        self.assertEqual(
+            train.train_type, self.train_type
+        )  # Verify that type is correctly linked
 
     def test_train_retrieve_serializer(self):
-        """Тест перевіряє серіалізатор для детального перегляду потяга з вкладеним об'єктом типу"""
+        """Test verifies the serializer for detailed train view with nested type object"""
         serializer = TrainRetrieveSerializer(instance=self.train)
         data = serializer.data
 
-        self.assertIsInstance(data["train_type"], dict)  # Перевіряємо, що тип - це об'єкт
+        self.assertIsInstance(
+            data["train_type"], dict
+        )  # Verify that type is an object
         self.assertEqual(data["train_type"]["name"], "Express")
 
 
 class RouteSerializerTest(TestCase):
     def setUp(self):
-        # Створюємо тестові станції та маршрут
+        # Create test stations and route
         self.source = Station.objects.create(
-            name="Kyiv",
-            latitude=50.4501,
-            longitude=30.5234
+            name="Kyiv", latitude=50.4501, longitude=30.5234
         )
         self.destination = Station.objects.create(
-            name="Lviv",
-            latitude=49.8397,
-            longitude=24.0297
+            name="Lviv", latitude=49.8397, longitude=24.0297
         )
         self.route = Route.objects.create(
-            source=self.source,
-            destination=self.destination,
-            distance=540
+            source=self.source, destination=self.destination, distance=540
         )
 
     def test_route_update_create_serializer(self):
-        """Тест перевіряє серіалізатор для створення/оновлення маршруту з назвами станцій"""
+        """Test verifies the serializer for creating/updating route with station names"""
         data = {
-            "source": "Kyiv",  # Використовуємо назву станції замість ID
+            "source": "Kyiv",  # Use station name instead of ID
             "destination": "Lviv",
-            "distance": 540
+            "distance": 540,
         }
         serializer = RouteUpdateCreateSerializer(data=data)
 
@@ -167,64 +161,55 @@ class RouteSerializerTest(TestCase):
         self.assertEqual(route.destination, self.destination)
 
     def test_route_string_serializer(self):
-        """Тест перевіряє серіалізатор для відображення маршруту з стрічковими представленнями станцій"""
+        """Test verifies the serializer for displaying route with string representations of stations"""
         serializer = RouteStringSerializer(instance=self.route)
         data = serializer.data
 
-        self.assertEqual(data["source"], str(self.source))  # Перевіряємо string representation
+        self.assertEqual(
+            data["source"], str(self.source)
+        )  # Verify string representation
         self.assertEqual(data["destination"], str(self.destination))
 
 
 class JourneySerializerTest(TestCase):
     def setUp(self):
-        # Створюємо всі необхідні об'єкти для тестування маршруту подорожі
+        # Create all necessary objects for testing journey route
         self.user = User.objects.create_user(
-            email="test@test.com",
-            password="testpass123",
-            username="testuser"
+            email="test@test.com", password="testpass123", username="testuser"
         )
-        self.crew_member = Crew.objects.create(
-            first_name="John",
-            last_name="Doe"
-        )
+        self.crew_member = Crew.objects.create(first_name="John", last_name="Doe")
         self.train_type = TrainType.objects.create(name="Express")
         self.train = Train.objects.create(
             name="Train 001",
             cargo_num=10,
             place_in_cargo=50,
-            train_type=self.train_type
+            train_type=self.train_type,
         )
         self.source = Station.objects.create(
-            name="Kyiv",
-            latitude=50.4501,
-            longitude=30.5234
+            name="Kyiv", latitude=50.4501, longitude=30.5234
         )
         self.destination = Station.objects.create(
-            name="Lviv",
-            latitude=49.8397,
-            longitude=24.0297
+            name="Lviv", latitude=49.8397, longitude=24.0297
         )
         self.route = Route.objects.create(
-            source=self.source,
-            destination=self.destination,
-            distance=540
+            source=self.source, destination=self.destination, distance=540
         )
         self.journey = Journey.objects.create(
             route=self.route,
             train=self.train,
             departure_time="2024-12-01T10:00:00Z",
-            arrival_time="2024-12-01T16:00:00Z"
+            arrival_time="2024-12-01T16:00:00Z",
         )
-        self.journey.users.add(self.crew_member)  # Додаємо члена екіпажу до подорожі
+        self.journey.users.add(self.crew_member)  # Add crew member to journey
 
     def test_journey_list_serializer(self):
-        """Тест перевіряє серіалізатор для списку подорожей з кількістю вільних квитків"""
+        """Test verifies the serializer for journey list with number of available tickets"""
         from django.db.models import Count, F
 
-        # Анотуємо подорож з розрахунком доступних квитків
+        # Annotate journey with calculation of available tickets
         journey = Journey.objects.annotate(
             tickets_available=F("train__cargo_num") * F("train__place_in_cargo")
-                              - Count("tickets")
+            - Count("tickets")
         ).get(pk=self.journey.pk)
 
         serializer = JourneyListSerializer(instance=journey)
@@ -234,26 +219,28 @@ class JourneySerializerTest(TestCase):
         self.assertIn("route", data)
         self.assertIn("train", data)
         self.assertIn("tickets_available", data)
-        self.assertEqual(data["tickets_available"], 500)  # 10 вагонів * 50 місць - 0 проданих квитків
+        self.assertEqual(
+            data["tickets_available"], 500
+        )  # 10 cars * 50 seats - 0 sold tickets
 
     def test_journey_retrieve_serializer(self):
-        """Тест перевіряє серіалізатор для детального перегляду подорожі з проданими квитками"""
+        """Test verifies the serializer for detailed journey view with sold tickets"""
         serializer = JourneyRetrieveSerializer(instance=self.journey)
         data = serializer.data
 
         self.assertIn("users", data)
         self.assertIn("route", data)
         self.assertIn("train", data)
-        self.assertIn("sold_tickets", data)  # Додаткове поле з проданими квитками
+        self.assertIn("sold_tickets", data)  # Additional field with sold tickets
 
     def test_journey_serializer_create(self):
-        """Тест перевіряє створення нової подорожі через серіалізатор"""
+        """Test verifies the creation of a new journey through the serializer"""
         data = {
             "route": self.route.id,
             "train": self.train.id,
-            "users": [self.crew_member.id],  # Список ID членів екіпажу
+            "users": [self.crew_member.id],  # List of crew member IDs
             "departure_time": "2024-12-02T10:00:00Z",
-            "arrival_time": "2024-12-02T16:00:00Z"
+            "arrival_time": "2024-12-02T16:00:00Z",
         }
         serializer = JourneySerializer(data=data)
 
@@ -265,38 +252,39 @@ class JourneySerializerTest(TestCase):
 
 class TicketSerializerTest(TestCase):
     def setUp(self):
-        # Створюємо всі об'єкти для тестування квитків
+        # Create all objects for testing tickets
         self.user = User.objects.create_user(
-            email="test@test.com",
-            password="testpass123",
-            username="testuser"
+            email="test@test.com", password="testpass123", username="testuser"
         )
         self.train_type = TrainType.objects.create(name="Express")
         self.train = Train.objects.create(
             name="Train 001",
             cargo_num=10,
             place_in_cargo=50,
-            train_type=self.train_type
+            train_type=self.train_type,
         )
-        self.source = Station.objects.create(name="Kyiv", latitude=50.4501, longitude=30.5234)
-        self.destination = Station.objects.create(name="Lviv", latitude=49.8397, longitude=24.0297)
-        self.route = Route.objects.create(source=self.source, destination=self.destination, distance=540)
+        self.source = Station.objects.create(
+            name="Kyiv", latitude=50.4501, longitude=30.5234
+        )
+        self.destination = Station.objects.create(
+            name="Lviv", latitude=49.8397, longitude=24.0297
+        )
+        self.route = Route.objects.create(
+            source=self.source, destination=self.destination, distance=540
+        )
         self.journey = Journey.objects.create(
             route=self.route,
             train=self.train,
             departure_time="2024-12-01T10:00:00Z",
-            arrival_time="2024-12-01T16:00:00Z"
+            arrival_time="2024-12-01T16:00:00Z",
         )
         self.order = Order.objects.create(user=self.user)
         self.ticket = Ticket.objects.create(
-            cargo=1,
-            seat=10,
-            journey=self.journey,
-            order=self.order
+            cargo=1, seat=10, journey=self.journey, order=self.order
         )
 
     def test_ticket_serializer_fields(self):
-        """Тест перевіряє базовий серіалізатор квитка з основними полями"""
+        """Test verifies the base ticket serializer with basic fields"""
         serializer = TicketSerializer(instance=self.ticket)
         data = serializer.data
 
@@ -305,90 +293,82 @@ class TicketSerializerTest(TestCase):
         self.assertEqual(data["seat"], 10)
 
     def test_ticket_list_serializer(self):
-        """Тест перевіряє серіалізатор для списку квитків з детальною інформацією про подорож"""
+        """Test verifies the serializer for ticket list with detailed journey information"""
         serializer = TicketListSerializer(instance=self.ticket)
         data = serializer.data
 
         self.assertIn("journey", data)
-        self.assertIsInstance(data["journey"], dict)  # Перевіряємо, що подорож - це об'єкт
+        self.assertIsInstance(
+            data["journey"], dict
+        )  # Verify that journey is an object
 
 
 class OrderSerializerTest(TestCase):
     def setUp(self):
-        # Створюємо всі об'єкти для тестування замовлень
+        # Create all objects for testing orders
         self.user = User.objects.create_user(
-            email="test@test.com",
-            password="testpass123",
-            username="testuser"
+            email="test@test.com", password="testpass123", username="testuser"
         )
         self.train_type = TrainType.objects.create(name="Express")
         self.train = Train.objects.create(
             name="Train 001",
             cargo_num=10,
             place_in_cargo=50,
-            train_type=self.train_type
+            train_type=self.train_type,
         )
-        self.source = Station.objects.create(name="Kyiv", latitude=50.4501, longitude=30.5234)
-        self.destination = Station.objects.create(name="Lviv", latitude=49.8397, longitude=24.0297)
-        self.route = Route.objects.create(source=self.source, destination=self.destination, distance=540)
+        self.source = Station.objects.create(
+            name="Kyiv", latitude=50.4501, longitude=30.5234
+        )
+        self.destination = Station.objects.create(
+            name="Lviv", latitude=49.8397, longitude=24.0297
+        )
+        self.route = Route.objects.create(
+            source=self.source, destination=self.destination, distance=540
+        )
         self.journey = Journey.objects.create(
             route=self.route,
             train=self.train,
             departure_time="2024-12-01T10:00:00Z",
-            arrival_time="2024-12-01T16:00:00Z"
+            arrival_time="2024-12-01T16:00:00Z",
         )
 
     def test_order_serializer_create_with_tickets(self):
-        """Тест перевіряє створення замовлення з квитками через транзакцію"""
+        """Test verifies the creation of an order with tickets through transaction"""
         data = {
             "user": self.user.id,
             "tickets": [
-                {
-                    "cargo": 1,
-                    "seat": 10,
-                    "journey": self.journey.id
-                },
-                {
-                    "cargo": 1,
-                    "seat": 11,
-                    "journey": self.journey.id
-                }
-            ]
+                {"cargo": 1, "seat": 10, "journey": self.journey.id},
+                {"cargo": 1, "seat": 11, "journey": self.journey.id},
+            ],
         }
         serializer = OrderSerializer(data=data)
 
         self.assertTrue(serializer.is_valid())
-        # У нашому OrderSerializer немає поля 'user' у Meta.fields,
-        # тому передаємо його окремо
+        # Our OrderSerializer does not have 'user' field in Meta.fields,
+        # so we pass it separately
         order = serializer.save(user=self.user)
 
         self.assertEqual(order.tickets.count(), 2)
         self.assertEqual(order.user, self.user)
 
     def test_order_serializer_empty_tickets_invalid(self):
-        """Тест перевіряє, що замовлення без квитків є невалідним"""
-        data = {
-            "user": self.user.id,
-            "tickets": []  # Порожній список квитків
-        }
+        """Test verifies that an order without tickets is invalid"""
+        data = {"user": self.user.id, "tickets": []}  # Empty tickets list
         serializer = OrderSerializer(data=data)
 
         self.assertFalse(serializer.is_valid())
         self.assertIn("tickets", serializer.errors)
 
     def test_order_list_serializer(self):
-        """Тест перевіряє серіалізатор для списку замовлень з детальною інформацією про квитки"""
+        """Test verifies the serializer for order list with detailed ticket information"""
         order = Order.objects.create(user=self.user)
-        Ticket.objects.create(
-            cargo=1,
-            seat=10,
-            journey=self.journey,
-            order=order
-        )
+        Ticket.objects.create(cargo=1, seat=10, journey=self.journey, order=order)
 
         serializer = OrderListSerializer(instance=order)
         data = serializer.data
 
         self.assertIn("tickets", data)
         self.assertIsInstance(data["tickets"], list)
-        self.assertEqual(len(data["tickets"]), 1)  # Перевіряємо кількість квитків у замовленні
+        self.assertEqual(
+            len(data["tickets"]), 1
+        )  # Verify the number of tickets in the order

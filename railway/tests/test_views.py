@@ -20,14 +20,14 @@ User = get_user_model()
 
 
 def sample_train_type(**params):
-    """Створює тестовий тип поїзда"""
+    """Creates a test train type"""
     defaults = {"name": "Express"}
     defaults.update(params)
     return TrainType.objects.create(**defaults)
 
 
 def sample_station(**params):
-    """Створює тестову станцію"""
+    """Creates a test station"""
     defaults = {
         "name": "Test Station",
         "latitude": 50.4501,
@@ -38,7 +38,7 @@ def sample_station(**params):
 
 
 def sample_train(train_type=None, **params):
-    """Створює тестовий поїзд"""
+    """Creates a test train"""
     if train_type is None:
         train_type = sample_train_type()
     defaults = {
@@ -52,7 +52,7 @@ def sample_train(train_type=None, **params):
 
 
 def sample_route(source=None, destination=None, **params):
-    """Створює тестовий маршрут"""
+    """Creates a test route"""
     if source is None:
         source = sample_station(name="Source")
     if destination is None:
@@ -67,7 +67,7 @@ def sample_route(source=None, destination=None, **params):
 
 
 def sample_journey(route=None, train=None, **params):
-    """Створює тестову подорож"""
+    """Creates a test journey"""
     if route is None:
         route = sample_route()
     if train is None:
@@ -97,7 +97,7 @@ class TrainTypeViewSetTest(TestCase):
         )
 
     def test_list_train_types_as_authenticated_user(self):
-        """Тест перегляду типів поїздів авторизованими користувачами"""
+        """Test viewing train types by authenticated users"""
         self.client.force_authenticate(user=self.user)
         sample_train_type(name="Express")
         sample_train_type(name="Regional")
@@ -106,20 +106,20 @@ class TrainTypeViewSetTest(TestCase):
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        if isinstance(res.data, dict) and 'results' in res.data:
-            self.assertEqual(len(res.data['results']), 2)
+        if isinstance(res.data, dict) and "results" in res.data:
+            self.assertEqual(len(res.data["results"]), 2)
         else:
             self.assertEqual(len(res.data), 2)
 
     def test_list_train_types_unauthenticated(self):
-        """Тест що неавторизовані користувачі не можуть переглядати типи поїздів"""
+        """Test that unauthenticated users cannot view train types"""
         url = reverse("railway:traintype-list")
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_train_type_as_admin(self):
-        """Тест створення типу поїзда адміністратором"""
+        """Test creating a train type by an administrator"""
         self.client.force_authenticate(user=self.admin)
         url = reverse("railway:traintype-list")
         payload = {"name": "High Speed"}
@@ -130,7 +130,7 @@ class TrainTypeViewSetTest(TestCase):
         self.assertTrue(TrainType.objects.filter(name="High Speed").exists())
 
     def test_create_train_type_as_regular_user(self):
-        """Тест що звичайні користувачі не можуть створювати типи поїздів"""
+        """Test that regular users cannot create train types"""
         self.client.force_authenticate(user=self.user)
         url = reverse("railway:traintype-list")
         payload = {"name": "High Speed"}
@@ -151,7 +151,7 @@ class StationViewSetTest(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_list_stations(self):
-        """Тест перегляду списку станцій"""
+        """Test viewing the list of stations"""
         sample_station(name="Kyiv")
         sample_station(name="Lviv")
 
@@ -159,13 +159,13 @@ class StationViewSetTest(TestCase):
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        if isinstance(res.data, dict) and 'results' in res.data:
-            self.assertEqual(len(res.data['results']), 2)
+        if isinstance(res.data, dict) and "results" in res.data:
+            self.assertEqual(len(res.data["results"]), 2)
         else:
             self.assertEqual(len(res.data), 2)
 
     def test_create_station(self):
-        """Тест створення станції"""
+        """Test creating a station"""
         url = reverse("railway:station-list")
         payload = {
             "name": "Odesa",
@@ -179,7 +179,7 @@ class StationViewSetTest(TestCase):
         self.assertTrue(Station.objects.filter(name="Odesa").exists())
 
     def test_retrieve_station(self):
-        """Тест отримання деталей конкретної станції"""
+        """Test retrieving details of a specific station"""
         station = sample_station(name="Kharkiv")
 
         url = reverse("railway:station-detail", args=[station.id])
@@ -201,7 +201,7 @@ class TrainViewSetTest(TestCase):
         self.train_type = sample_train_type(name="Express")
 
     def test_list_trains(self):
-        """Тест перегляду списку поїздів"""
+        """Test viewing the list of trains"""
         sample_train(name="Train 001", train_type=self.train_type)
         sample_train(name="Train 002", train_type=self.train_type)
 
@@ -209,13 +209,13 @@ class TrainViewSetTest(TestCase):
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        if isinstance(res.data, dict) and 'results' in res.data:
-            self.assertEqual(len(res.data['results']), 2)
+        if isinstance(res.data, dict) and "results" in res.data:
+            self.assertEqual(len(res.data["results"]), 2)
         else:
             self.assertEqual(len(res.data), 2)
 
     def test_filter_trains_by_type(self):
-        """Тест фільтрації поїздів за типом"""
+        """Test filtering trains by type"""
         train_type2 = sample_train_type(name="Regional")
         sample_train(name="Express Train", train_type=self.train_type)
         sample_train(name="Regional Train", train_type=train_type2)
@@ -224,15 +224,15 @@ class TrainViewSetTest(TestCase):
         res = self.client.get(url, {"train_types": str(self.train_type.id)})
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        if isinstance(res.data, dict) and 'results' in res.data:
-            self.assertEqual(len(res.data['results']), 1)
-            self.assertEqual(res.data['results'][0]["name"], "Express Train")
+        if isinstance(res.data, dict) and "results" in res.data:
+            self.assertEqual(len(res.data["results"]), 1)
+            self.assertEqual(res.data["results"][0]["name"], "Express Train")
         else:
             self.assertEqual(len(res.data), 1)
             self.assertEqual(res.data[0]["name"], "Express Train")
 
     def test_retrieve_train(self):
-        """Тест отримання деталей конкретного поїзда"""
+        """Test retrieving details of a specific train"""
         train = sample_train(name="Train 001", train_type=self.train_type)
 
         url = reverse("railway:train-detail", args=[train.id])
@@ -242,7 +242,7 @@ class TrainViewSetTest(TestCase):
         self.assertEqual(res.data["name"], "Train 001")
 
     def test_create_train(self):
-        """Тест створення поїзда"""
+        """Test creating a train"""
         url = reverse("railway:train-list")
         payload = {
             "name": "New Train",
@@ -251,7 +251,7 @@ class TrainViewSetTest(TestCase):
             "train_type": self.train_type.name,
         }
 
-        res = self.client.post(url, payload, format='json')
+        res = self.client.post(url, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Train.objects.filter(name="New Train").exists())
@@ -270,20 +270,20 @@ class RouteViewSetTest(TestCase):
         self.destination = sample_station(name="Lviv")
 
     def test_list_routes(self):
-        """Тест перегляду списку маршрутів"""
+        """Test viewing the list of routes"""
         sample_route(source=self.source, destination=self.destination)
 
         url = reverse("railway:route-list")
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        if isinstance(res.data, dict) and 'results' in res.data:
-            self.assertEqual(len(res.data['results']), 1)
+        if isinstance(res.data, dict) and "results" in res.data:
+            self.assertEqual(len(res.data["results"]), 1)
         else:
             self.assertEqual(len(res.data), 1)
 
     def test_create_route(self):
-        """Тест створення маршруту"""
+        """Test creating a route"""
         url = reverse("railway:route-list")
         payload = {
             "source": self.source.name,
@@ -291,7 +291,7 @@ class RouteViewSetTest(TestCase):
             "distance": 150,
         }
 
-        res = self.client.post(url, payload, format='json')
+        res = self.client.post(url, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertTrue(
@@ -301,7 +301,7 @@ class RouteViewSetTest(TestCase):
         )
 
     def test_retrieve_route(self):
-        """Тест отримання деталей конкретного маршруту"""
+        """Test retrieving details of a specific route"""
         route = sample_route(source=self.source, destination=self.destination)
 
         url = reverse("railway:route-detail", args=[route.id])
@@ -328,18 +328,18 @@ class JourneyViewSetTest(TestCase):
         self.route = sample_route(source=self.source, destination=self.destination)
 
     def test_list_journeys(self):
-        """Тест перегляду списку подорожей"""
+        """Test viewing the list of journeys"""
         sample_journey(route=self.route, train=self.train)
 
         url = reverse("railway:journey-list")
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data['results']), 1)
-        self.assertIn("tickets_available", res.data['results'][0])
+        self.assertEqual(len(res.data["results"]), 1)
+        self.assertIn("tickets_available", res.data["results"][0])
 
     def test_create_journey(self):
-        """Тест створення подорожі"""
+        """Test creating a journey"""
         url = reverse("railway:journey-list")
         departure = timezone.now() + timedelta(days=2)
         arrival = departure + timedelta(hours=3)
@@ -357,7 +357,7 @@ class JourneyViewSetTest(TestCase):
         self.assertEqual(Journey.objects.count(), 1)
 
     def test_retrieve_journey(self):
-        """Тест отримання деталей конкретної подорожі"""
+        """Test retrieving details of a specific journey"""
         journey = sample_journey(route=self.route, train=self.train)
 
         url = reverse("railway:journey-detail", args=[journey.id])
@@ -381,46 +381,40 @@ class TicketViewSetTest(TestCase):
         self.order = Order.objects.create(user=self.user)
 
     def test_list_tickets_for_user(self):
-        """Тест перегляду квитків для авторизованого користувача"""
-        Ticket.objects.create(
-            cargo=1, seat=1, journey=self.journey, order=self.order
-        )
+        """Test viewing tickets for an authenticated user"""
+        Ticket.objects.create(cargo=1, seat=1, journey=self.journey, order=self.order)
 
         url = reverse("railway:ticket-list")
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        if isinstance(res.data, dict) and 'results' in res.data:
-            self.assertEqual(len(res.data['results']), 1)
+        if isinstance(res.data, dict) and "results" in res.data:
+            self.assertEqual(len(res.data["results"]), 1)
         else:
             self.assertEqual(len(res.data), 1)
 
     def test_user_can_only_see_own_tickets(self):
-        """Тест що користувачі можуть бачити тільки свої квитки"""
+        """Test that users can only see their own tickets"""
         other_user = User.objects.create_user(
             username="other",
             email="other@test.com",
             password="testpass123",
         )
         other_order = Order.objects.create(user=other_user)
-        Ticket.objects.create(
-            cargo=1, seat=1, journey=self.journey, order=other_order
-        )
-        Ticket.objects.create(
-            cargo=2, seat=2, journey=self.journey, order=self.order
-        )
+        Ticket.objects.create(cargo=1, seat=1, journey=self.journey, order=other_order)
+        Ticket.objects.create(cargo=2, seat=2, journey=self.journey, order=self.order)
 
         url = reverse("railway:ticket-list")
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        if isinstance(res.data, dict) and 'results' in res.data:
-            self.assertEqual(len(res.data['results']), 1)
+        if isinstance(res.data, dict) and "results" in res.data:
+            self.assertEqual(len(res.data["results"]), 1)
         else:
             self.assertEqual(len(res.data), 1)
 
     def test_create_ticket(self):
-        """Тест створення квитка"""
+        """Test creating a ticket"""
         url = reverse("railway:ticket-list")
         payload = {
             "cargo": 1,
@@ -447,17 +441,17 @@ class OrderViewSetTest(TestCase):
         self.journey = sample_journey()
 
     def test_list_orders_for_user(self):
-        """Тест перегляду замовлень для авторизованого користувача"""
+        """Test viewing orders for an authenticated user"""
         Order.objects.create(user=self.user)
 
         url = reverse("railway:order-list")
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data['results']), 1)
+        self.assertEqual(len(res.data["results"]), 1)
 
     def test_user_can_only_see_own_orders(self):
-        """Тест що користувачі можуть бачити тільки свої замовлення"""
+        """Test that users can only see their own orders"""
         other_user = User.objects.create_user(
             username="other",
             email="other@test.com",
@@ -470,10 +464,10 @@ class OrderViewSetTest(TestCase):
         res = self.client.get(url)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(res.data['results']), 1)
+        self.assertEqual(len(res.data["results"]), 1)
 
     def test_create_order(self):
-        """Тест створення замовлення"""
+        """Test creating an order"""
         url = reverse("railway:order-list")
         payload = {
             "tickets": [
@@ -493,7 +487,7 @@ class OrderViewSetTest(TestCase):
         self.assertEqual(order.user, self.user)
 
     def test_retrieve_order(self):
-        """Тест отримання деталей конкретного замовлення"""
+        """Test retrieving details of a specific order"""
         order = Order.objects.create(user=self.user)
 
         url = reverse("railway:order-detail", args=[order.id])
@@ -502,7 +496,7 @@ class OrderViewSetTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_unauthenticated_user_cannot_access_orders(self):
-        """Тест що неавторизовані користувачі не можуть отримати доступ до замовлень"""
+        """Test that unauthenticated users cannot access orders"""
         self.client.force_authenticate(user=None)
 
         url = reverse("railway:order-list")
@@ -522,7 +516,7 @@ class IntegrationTest(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_complete_booking_flow(self):
-        """Тест повного процесу бронювання квитка"""
+        """Test the complete ticket booking flow"""
         train_type = sample_train_type(name="Express")
         train = sample_train(train_type=train_type, cargo_num=5, place_in_cargo=20)
         route = sample_route()

@@ -1,33 +1,33 @@
 # Railway Service API
 
-## Опис проекту
+## Project Description
 
-Цей API проект призначений для адміністрування руху потягів на залізничних станціях, для реєстрації користувачів залізничної мережі і придбання ними квитків.
+This API project is designed for managing train traffic at railway stations, registering users of the railway network, and allowing them to purchase tickets.
 
-## Функціонал
+## Features
 
-- Всі моделі зареєстровані в адмін панелі
-- В адмін панелі в замовленнях можна одразу створювати квитки
-- Створена сторінка реєстрації користувачів `user/register`
-- Реалізована токен аутентифікація (токен можна отримати на сторінці `user/login`)
-- Всі сторінки окрім реєстрації тільки для аутентифікованих користувачів
-- Сторінка `user/me` дає змогу редагувати дані про себе
-- Пароль користувача зберігається у зашифрованому вигляді
-- Для всіх роутів реалізовано CRUD
-- Роути `api/railway/traintypes` та `user/crew` можна редагувати тільки адмінам, іншим доступні тільки безпечні методи
-- Для всіх сторінок реалізована пагінація по 5 об'єктів на сторінку
-- Роут `api/railway/train` можна фільтрувати за типами, передавши їх в query string під ім'ям `train_types`
-- На роуті `api/railway/journey` додано відображення кількості доступних квитків
-- Роути `api/railway/ticket` та `api/railway/order` відображають квитки та замовлення тільки залогіненого користувача
-- Сторінка `api/railway/ticket` упорядковується за вагонами і купленими в них місцями
-- Всі сторінки коректно відображаються і всі запити оптимізовані
-- В проекті використано серіалайзери та вкладені серіалайзери
+- All models are registered in the admin panel
+- In the admin panel, tickets can be created directly in orders
+- User registration page created at `user/register`
+- Token authentication implemented (token can be obtained at `user/login` page)
+- All pages except registration are only for authenticated users
+- `user/me` page allows editing your own data
+- User password is stored in encrypted form
+- CRUD implemented for all routes
+- Routes `api/railway/traintypes` and `user/crew` can only be edited by admins, other users have access only to safe methods
+- Pagination implemented for all pages with 5 objects per page
+- Route `api/railway/train` can be filtered by types by passing them in query string under the name `train_types`
+- Route `api/railway/journey` shows the number of available tickets
+- Routes `api/railway/ticket` and `api/railway/order` display tickets and orders only for the logged-in user
+- Page `api/railway/ticket` is ordered by carriages and seats purchased in them
+- All pages are displayed correctly and all queries are optimized
+- The project uses serializers and nested serializers
 
-## Як запустити проект локально
+## How to Run the Project Locally
 
-### Крок 1: Клонування та встановлення залежностей
+### Step 1: Cloning and Installing Dependencies
 
-Виконайте такі команди в терміналі:
+Execute the following commands in the terminal:
 
 ```bash
 git clone https://github.com/Dmitriy527/railway_service.git
@@ -37,9 +37,9 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
-### Крок 2: Налаштування бази даних SQLite
+### Step 2: Setting Up SQLite Database
 
-В налаштуваннях проекту в пункті `DATABASES` потрібно розкоментувати такі рядки:
+In the project settings in the `DATABASES` section, you need to uncomment the following lines:
 
 ```python
 'default': {
@@ -48,7 +48,7 @@ python manage.py migrate
 }
 ```
 
-та закоментувати такі рядки:
+and comment out the following lines:
 
 ```python
 "default": {
@@ -61,9 +61,9 @@ python manage.py migrate
 }
 ```
 
-### Крок 3: Створення файлу .env
+### Step 3: Creating .env File
 
-В корені проекту створіть файл `.env` з наступним вмістом:
+In the project root, create a `.env` file with the following content:
 
 ```
 POSTGRES_PASSWORD=your_password
@@ -75,34 +75,34 @@ PGDATA=/var/lib/postgresql/data
 SECRET_KEY=your_secret_key
 ```
 
-### Крок 4: Створення суперкористувача
+### Step 4: Creating Superuser
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### Крок 5: Запуск проекту
+### Step 5: Running the Project
 
 ```bash
 python manage.py runserver
 ```
 
-## Як запустити проект в Docker Desktop
+## How to Run the Project in Docker Desktop
 
-### Крок 1: Встановлення Docker Desktop
+### Step 1: Installing Docker Desktop
 
-Завантажте та встановіть Docker Desktop за посиланням: https://www.docker.com/products/docker-desktop/
+Download and install Docker Desktop from: https://www.docker.com/products/docker-desktop/
 
-### Крок 2: Клонування проекту
+### Step 2: Cloning the Project
 
 ```bash
 git clone https://github.com/Dmitriy527/railway_service.git
 cd railway_service
 ```
 
-### Крок 3: Створення файлу .env
+### Step 3: Creating .env File
 
-В корені проекту створіть файл `.env` з наступним вмістом:
+In the project root, create a `.env` file with the following content:
 
 ```
 POSTGRES_PASSWORD=your_password
@@ -114,9 +114,9 @@ PGDATA=/var/lib/postgresql/data
 SECRET_KEY=your_secret_key
 ```
 
-### Крок 4: Налаштування бази даних PostgreSQL
+### Step 4: Setting Up PostgreSQL Database
 
-В налаштуваннях проекту в пункті `DATABASES` потрібно розкоментувати такі рядки:
+In the project settings in the `DATABASES` section, you need to uncomment the following lines:
 
 ```python
 "default": {
@@ -129,7 +129,7 @@ SECRET_KEY=your_secret_key
 }
 ```
 
-та закоментувати такі рядки:
+and comment out the following lines:
 
 ```python
 'default': {
@@ -138,56 +138,56 @@ SECRET_KEY=your_secret_key
 }
 ```
 
-### Крок 5: Створення та запуск контейнерів
+### Step 5: Creating and Running Containers
 
 ```bash
 docker-compose up --build
 ```
 
-### Крок 6: Створення суперкористувача
+### Step 6: Creating Superuser
 
-Відкрийте нову вкладку в терміналі та виконайте:
+Open a new terminal tab and execute:
 
 ```bash
 docker-compose exec railway_service python manage.py createsuperuser
 ```
 
-### Крок 7: Використання проекту
+### Step 7: Using the Project
 
-Використовуйте посилання: http://localhost:8001/
+Use the link: http://localhost:8001/
 
-## Інструкція по використанню API
+## API Usage Instructions
 
-- Для реєстрації нового користувача використовуйте `user/register`
-- Для отримання токену використовуйте `user/login`
-- Документація API доступна за посиланням: `api/schema/swagger-ui/`
+- To register a new user, use `user/register`
+- To obtain a token, use `user/login`
+- API documentation is available at: `api/schema/swagger-ui/`
 
-## Приклади запитів
+## Request Examples
 
-### Postman - запит на сторінку `user/me`
+### Postman - Request to `user/me` Page
 
-![img_2.png](img_2.png)
+![img_2.png](Images/img_2.png)
 
 ### Browsable API
 
-#### Запит на сторінку `api/railway/tickets/`
+#### Request to `api/railway/tickets/` Page
 
-![img_3.png](img_3.png)
+![img_3.png](Images/img_3.png)
 
-#### Запит на сторінку `api/railway/orders/`
+#### Request to `api/railway/orders/` Page
 
-![img_4.png](img_4.png)
+![img_4.png](Images/img_4.png)
 
-#### Запит на сторінку `api/railway/journeys/`
+#### Request to `api/railway/journeys/` Page
 
-![img_5.png](img_5.png)
+![img_5.png](Images/img_5.png)
 
-## Діаграма структури бази даних
+## Database Structure Diagram
 
-![img_6.png](img_6.png)
+![img_6.png](Images/img_6.png)
 
-## Автор
+## Author
 
-**Дмитро Дмитрович Василюк**
+**Dmytro Dmytrovych Vasyliuk**
 
 Email: dimkanividimka4@gmail.com
